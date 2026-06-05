@@ -1,0 +1,379 @@
+{
+	"info": {
+		"_postman_id": "8b51d8b6-96b6-4b2a-89a1-7d12f384d9f1",
+		"name": "AI-Genius Auth & RBAC Subsystem",
+		"description": "Postman Collection for verifying the secure stateless authentication, token lifecycle (Access & Refresh tokens), and Role-Based Access Control (RBAC) in the AI-Genius application.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Register New User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"newuser@aigenius.com\",\n    \"password\": \"UserPassword123!\",\n    \"role\": \"Premium_User\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						},
+						"description": "Registers a new user inside the mock database with a hashed password and selected role membership (Admin, Premium_User, Free_User)."
+					},
+					"response": []
+				},
+				{
+					"name": "Login as Admin",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.success && jsonData.accessToken) {",
+									"    pm.collectionVariables.set(\"accessToken\", jsonData.accessToken);",
+									"    pm.test(\"Admin Logged In successfully, Access Token captured\", function () {",
+									"        pm.expect(jsonData.accessToken).to.be.a('string');",
+									"        pm.expect(jsonData.user.role).to.eql('Admin');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"admin@aigenius.com\",\n    \"password\": \"Admin123!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Authenticates the Admin account. On success, it yields the short-lived Access Token in response payload (captured into variable) and sets the long-lived Refresh Token in secure cookie."
+					},
+					"response": []
+				},
+				{
+					"name": "Login as Premium User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.success && jsonData.accessToken) {",
+									"    pm.collectionVariables.set(\"accessToken\", jsonData.accessToken);",
+									"    pm.test(\"Premium User Logged In successfully, Access Token captured\", function () {",
+									"        pm.expect(jsonData.accessToken).to.be.a('string');",
+									"        pm.expect(jsonData.user.role).to.eql('Premium_User');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"premium@aigenius.com\",\n    \"password\": \"Premium123!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Authenticates the Premium User account. Captures Access Token into variable."
+					},
+					"response": []
+				},
+				{
+					"name": "Login as Free User",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.success && jsonData.accessToken) {",
+									"    pm.collectionVariables.set(\"accessToken\", jsonData.accessToken);",
+									"    pm.test(\"Free User Logged In successfully, Access Token captured\", function () {",
+									"        pm.expect(jsonData.accessToken).to.be.a('string');",
+									"        pm.expect(jsonData.user.role).to.eql('Free_User');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"free@aigenius.com\",\n    \"password\": \"Free123!\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Authenticates the Free User account. Captures Access Token into variable."
+					},
+					"response": []
+				},
+				{
+					"name": "Silent Refresh Token",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"var jsonData = pm.response.json();",
+									"if (jsonData.success && jsonData.accessToken) {",
+									"    pm.collectionVariables.set(\"accessToken\", jsonData.accessToken);",
+									"    pm.test(\"Access Token refreshed successfully\", function () {",
+									"        pm.expect(jsonData.accessToken).to.be.a('string');",
+									"    });",
+									"}"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/refresh",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"refresh"
+							]
+						},
+						"description": "Fires a request to silent refresh endpoint. The client doesn't pass tokens in payload; the backend automatically reads the Refresh Token cookie, validates it, and responds with a fresh Access Token."
+					},
+					"response": []
+				},
+				{
+					"name": "Logout Session",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.collectionVariables.set(\"accessToken\", \"\");",
+									"pm.test(\"Logged out successfully\", function () {",
+									"    var jsonData = pm.response.json();",
+									"    pm.expect(jsonData.success).to.be.true;",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/logout",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							]
+						},
+						"description": "Clears the active Refresh Token from server whitelist and instructs the browser/Postman to remove the cookie."
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication workflow containing login, registration, logout, and token refresh."
+		},
+		{
+			"name": "AI Models (RBAC Test)",
+			"item": [
+				{
+					"name": "Query Free AI Model",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/ai/free-model",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"ai",
+								"free-model"
+							]
+						},
+						"description": "Tests access to the Free AI Model. This endpoint requires standard authentication (any role: Free_User, Premium_User, Admin)."
+					},
+					"response": []
+				},
+				{
+					"name": "Query Premium AI Model",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							},
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"prompt\": \"Explain how asymmetric cryptography protects network packets.\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/ai/premium-model",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"ai",
+								"premium-model"
+							]
+						},
+						"description": "Tests access to the Premium AI Model. Allowed roles: Premium_User and Admin. Free_User will receive a 403 Forbidden response."
+					},
+					"response": []
+				},
+				{
+					"name": "Delete System Cache (Admin Only)",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Authorization",
+								"value": "Bearer {{accessToken}}"
+							}
+						],
+						"url": {
+							"raw": "{{baseUrl}}/api/ai/purge-cache",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"ai",
+								"purge-cache"
+							]
+						},
+						"description": "Tests cache purge command. Accessible only by Admin. Both Free_User and Premium_User will receive 403 Forbidden responses."
+					},
+					"response": []
+				}
+			],
+			"description": "Testing endpoints designed to enforce Role-Based Access Control limits."
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseUrl",
+			"value": "http://localhost:5000",
+			"type": "string"
+		},
+		{
+			"key": "accessToken",
+			"value": "",
+			"type": "string"
+		}
+	]
+}
