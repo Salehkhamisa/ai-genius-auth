@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const db = require('../db');
+const User = require('../models/User');
 
 // Middleware to protect routes & verify stateless access token
 exports.protect = async (req, res, next) => {
@@ -43,7 +43,7 @@ exports.protect = async (req, res, next) => {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
 
     // Get user from database to ensure they still exist
-    const user = await db.findUserById(decoded.id);
+    const user = await User.findById(decoded.id);
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -52,9 +52,18 @@ exports.protect = async (req, res, next) => {
       });
     }
 
+    // Check if user is locked out
+    if (user.isLocked()) {
+      return res.status(401).json({
+        success: false,
+        message: 'Your account is locked due to multiple failed login attempts. Please try again later.',
+        code: 'ACCOUNT_LOCKED'
+      });
+    }
+
     // Attach user payload (id, email, role) to request
     req.user = {
-      id: user.id,
+      id: user.id || user._id,
       email: user.email,
       role: user.role
     };

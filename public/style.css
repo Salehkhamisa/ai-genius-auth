@@ -1204,3 +1204,23 @@ input:focus, select:focus, textarea:focus {
   background: rgba(3, 5, 10, 0.7);
   margin-top: 40px;
 }
+
+/* Authentication Error Message Container */
+.auth-error-message {
+  background: rgba(239, 68, 68, 0.08);
+  border: 1px solid rgba(239, 68, 68, 0.2);
+  color: #fca5a5;
+  padding: 10px 14px;
+  border-radius: 8px;
+  font-size: 0.82rem;
+  margin-bottom: 16px;
+  text-align: center;
+  animation: shakeError 0.4s ease-in-out;
+}
+
+@keyframes shakeError {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+

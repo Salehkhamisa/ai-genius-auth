@@ -22,6 +22,7 @@ const authRole = document.getElementById('auth-role');
 const registerRoleGroup = document.getElementById('register-role-group');
 const authSubmitBtn = document.getElementById('auth-submit-btn');
 const userStatusCard = document.getElementById('user-status-card');
+const authErrorDisplay = document.getElementById('auth-error-display');
 
 const statusAvatarRole = document.getElementById('status-avatar-role');
 const statusEmail = document.getElementById('status-email');
@@ -81,9 +82,22 @@ function clearConsoleLogs() {
   addLog('info', 'Event logger cleared.');
 }
 
+// Helper to display error messages directly inside the login card
+function showAuthError(msg) {
+  if (!authErrorDisplay) return;
+  if (msg) {
+    authErrorDisplay.textContent = msg;
+    authErrorDisplay.classList.remove('hidden');
+  } else {
+    authErrorDisplay.textContent = '';
+    authErrorDisplay.classList.add('hidden');
+  }
+}
+
 // Switch Auth Tabs (Login / Register)
 function switchAuthTab(tab) {
   currentAuthTab = tab;
+  showAuthError(null); // Clear previous errors
   document.getElementById('tab-login').classList.toggle('active', tab === 'login');
   document.getElementById('tab-register').classList.toggle('active', tab === 'register');
   
@@ -149,6 +163,7 @@ async function loginSeeded(email, password) {
   authEmail.value = email;
   authPassword.value = password;
   switchAuthTab('login');
+  showAuthError(null);
   addLog('info', `Using quick-login credentials for: ${email}`);
   await executeLogin(email, password);
 }
@@ -158,6 +173,7 @@ async function handleAuthSubmit(e) {
   e.preventDefault();
   const email = authEmail.value;
   const password = authPassword.value;
+  showAuthError(null);
 
   if (currentAuthTab === 'login') {
     addLog('info', `Initiating standard login request for ${email}...`);
@@ -185,10 +201,11 @@ async function executeRegister(email, password, role) {
       await executeLogin(email, password);
     } else {
       addLog('error', `Registration rejected: ${data.message || 'Unknown error'}`);
-      alert(`Registration Failed: ${data.message}`);
+      showAuthError(data.message || 'Registration failed');
     }
   } catch (error) {
     addLog('error', `Registration request error: ${error.message}`);
+    showAuthError(`Network error: ${error.message}`);
   }
 }
 
@@ -226,10 +243,11 @@ async function executeLogin(email, password) {
       authPassword.value = '';
     } else {
       addLog('error', `Auth rejected: ${data.message || 'Invalid credentials'}`);
-      alert(`Login Failed: ${data.message || 'Invalid credentials'}`);
+      showAuthError(data.message || 'Invalid credentials');
     }
   } catch (error) {
     addLog('error', `Login request error: ${error.message}`);
+    showAuthError(`Network error: ${error.message}`);
   }
 }
 
