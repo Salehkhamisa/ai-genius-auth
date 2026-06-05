@@ -617,7 +617,23 @@ async function runSelectedModel() {
   // Check credits
   if (!isInfiniteCredits && currentCredits < cost) {
     addLog('error', `Execution Blocked: Insufficient Credits. Need ${cost} tokens, only have ${currentCredits}.`);
-    alert(`Insufficient Credits! This operation requires ${cost} tokens, but you only have ${currentCredits}. Please logout and use a higher-tier profile.`);
+    
+    // Visualise the credit warning directly in the chat container
+    chatPlaceholder.classList.add('hidden');
+    const warningDiv = document.createElement('div');
+    warningDiv.className = 'chat-message ai';
+    warningDiv.innerHTML = `
+      <div class="chat-avatar ai" style="background:var(--danger); color:white;">⚠️</div>
+      <div class="chat-content">
+        <p style="color:var(--danger); font-weight:600; font-size:0.95rem;">Access Blocked: Insufficient Credits</p>
+        <p style="font-size:0.85rem; margin-top:4px;">This operation requires <strong style="color:var(--accent-cyan);">${cost} tokens</strong>, but your current balance only has <strong style="color:var(--warning);">${currentCredits} tokens</strong>.</p>
+        <p style="font-size:0.82rem; margin-top:6px; color:var(--text-muted); line-height:1.4;">Please logout and authenticate using a <strong>Premium User</strong> (500 tokens) or <strong>Admin</strong> (Unlimited tokens) profile to access this model.</p>
+      </div>
+    `;
+    chatOutputCanvas.appendChild(warningDiv);
+    chatOutputCanvas.scrollTop = chatOutputCanvas.scrollHeight;
+    
+    alert(`Insufficient Credits! This operation requires ${cost} tokens, but you only have ${currentCredits}.`);
     return;
   }
 
